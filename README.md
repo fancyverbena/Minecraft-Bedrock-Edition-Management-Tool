@@ -1,0 +1,2 @@
+# Minecraft-Bedrock-Edition-Management-Tool
+Minecraft Bedrock Edition管理ツールは、コマンドライン操作で手軽にバージョン管理や保守作業を行えるユーティリティです。アップデート確認、自動更新またはMicrosoft Store起動、任意バージョンへのダウングレードが可能。加えて、バックアップ作成と復元機能を備え、不具合や更新失敗時にも即座に元の状態に戻せます。
