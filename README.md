@@ -80,3 +80,4 @@ Minecraft Bedrock Edition（統合版）のアップデート管理・バージ�
 - 本ツールは非公式です
 - バックアップやバージョン変更は自己責任で行ってください
 - Microsoft や Mojang とは関係ありません
+- バグ報告や機能追加などはhttps://discord.gg/dqvmWNkFBaで受け付けます
