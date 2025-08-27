@@ -6,10 +6,19 @@
         "backup_create": "バックアップを作成",
         "backup_restore": "バックアップからリストア",
         "downgrade": "バージョンダウングレード",
-        "exit": "終了",
-        "invalid_input": "無効な入力です",
         "language": "言語設定",
-        "select": "選択"
+        "version_history": "バージョン履歴",
+        "backup_cleanup": "バックアップのクリーンアップ",
+        "exit": "終了",
+        "select": "選択",
+        "invalid_input": "無効な入力です",
+        "backup_search": "バックアップを検索",
+        "backup_compare": "バックアップを比較",
+        "install_history": "インストール履歴",
+        "auto_backup_settings": "自動バックアップ設定",
+        "world_export": "ワールドデータのエクスポート",
+        "backup_encrypt": "バックアップの暗号化",
+        "backup_stats": "バックアップの統計情報"
     },
     "version": {
         "current": "現在",
@@ -25,12 +34,43 @@
         "creating": "バックアップ作成中 → {}",
         "complete": "✅ バックアップ完了",
         "failed": "❌ バックアップ失敗: {}",
-        "no_folder": "バックアップフォルダがありません",
+        "no_folder": "バックアップフォルダが見つかりません",
+        "no_old_backups": "クリーンアップが必要な古いバックアップはありません",
+        "cleanup_start": "古いバックアップ {} 件を削除します...",
+        "deleted": "削除完了: {}",
+        "delete_failed": "削除失敗: {}",
+        "cleanup_complete": "✅ クリーンアップが完了しました",
         "no_backups": "リストア可能なバックアップがありません",
         "available": "利用可能なバックアップ:",
         "select_number": "番号を選択 (1-{}):",
         "restore_complete": "✅ リストア完了",
-        "restore_failed": "❌ リストア失敗: {}"
+        "restore_failed": "❌ リストア失敗: {}",
+        "preview_title": "\n=== バックアップの内容 ===",
+        "preview_worlds": "ワールド数: {} 個",
+        "preview_resources": "リソースパック: {} 個",
+        "preview_size": "合計サイズ: {}MB",
+        "preview_failed": "❌ プレビューの取得に失敗: {}",
+        "confirm_restore": "このバックアップを復元しますか？ (y/n): ",
+        "restore_cancelled": "復元をキャンセルしました",
+        "compress_complete": "✅ バックアップを圧縮しました: {}",
+        "compress_failed": "❌ 圧縮に失敗: {}",
+        "search_no_results": "検索結果が見つかりませんでした",
+        "search_results": "\n検索結果:",
+        "enter_search": "検索キーワードを入力: ",
+        "compare_not_enough": "比較には2つ以上のバックアップが必要です",
+        "select_backups": "\n比較するバックアップを選択:",
+        "select_first": "1つ目のバックアップを選択 (番号): ",
+        "select_second": "2つ目のバックアップを選択 (番号): ",
+        "comparing": "\n差分を確認中...",
+        "file_removed": "- 削除されたファイル: {}",
+        "file_modified": "* 変更されたファイル: {}",
+        "file_added": "+ 追加されたファイル: {}",
+        "no_differences": "差分は見つかりませんでした",
+        "select_file": "暗号化するファイルのパスを入力: ",
+        "enter_password": "パスワードを入力: ",
+        "encrypt_complete": "✅ 暗号化完了: {}",
+        "encrypt_failed": "❌ 暗号化失敗: {}",
+        "file_not_found": "指定されたファイルが見つかりません"
     },
     "downgrade": {
         "warning": "⚠️ ダウングレードは自己責任です。セーブデータの保護のため自動バックアップを作成します。",
@@ -57,7 +97,10 @@
         "selected_release": "選択されたリリース: {} / {}",
         "complete": "✨ 更新完了: {}",
         "failed": "❌ 自動更新に失敗しました。手動インストールを案内します。",
-        "open_file": "エクスプローラーで開く: {}"
+        "open_file": "エクスプローラーで開く: {}",
+        "auto_checking": "アップデートを自動チェック中...",
+        "new_version_available": "新しいバージョン {} が利用可能です",
+        "proceed_with_update": "アップデートを実行しますか？ (y/n): "
     },
     "install": {
         "starting": "インストールを開始します...",
@@ -66,6 +109,43 @@
         "delete_failed": "⚠️ ファイル削除に失敗: {}",
         "force_update": "↺ 新しいバージョンが存在 → 強制インストールで処理開始",
         "failed": "❌ インストール失敗:\n{}",
-        "error": "❌ インストールエラー: {}"
+        "error": "❌ インストールエラー: {}",
+        "using_cache": "キャッシュされたインストーラーを使用します",
+        "downloading_to_cache": "インストーラーをキャッシュにダウンロード中...",
+        "cache_complete": "✅ キャッシュへの保存完了",
+        "cache_failed": "❌ キャッシュ保存失敗: {}"
+    },
+    "history": {
+        "title": "\n=== インストール履歴 ===",
+        "no_records": "インストール履歴がありません",
+        "load_failed": "履歴の読み込みに失敗しました",
+        "entry_format": "{}: v{} ({})",
+        "method_auto": "自動インストール",
+        "method_manual": "手動インストール",
+        "method_store": "Microsoft Store",
+        "method_downgrade": "ダウングレード"
+    },
+    "auto_backup": {
+        "enabled": "自動バックアップが有効です",
+        "disabled": "自動バックアップは無効です",
+        "next_backup": "次回のバックアップ: {}",
+        "toggle_prompt": "自動バックアップを有効にしますか？ (y/n): "
+    },
+    "worlds": {
+        "no_directory": "ワールドディレクトリが見つかりません",
+        "no_worlds": "ワールドが見つかりません",
+        "available": "\n利用可能なワールド:",
+        "select": "エクスポートするワールドを選択 (番号): ",
+        "export_complete": "✅ エクスポート完了: {}",
+        "invalid_selection": "無効な選択です"
+    },
+    "stats": {
+        "title": "\n=== バックアップ統計情報 ===",
+        "total_backups": "総バックアップ数: {}",
+        "auto_backups": "自動バックアップ数: {}",
+        "manual_backups": "手動バックアップ数: {}",
+        "total_size": "合計サイズ: {}MB",
+        "encrypted_backups": "暗号化バックアップ数: {}",
+        "latest_backup": "最新バックアップ: {}"
     }
 }

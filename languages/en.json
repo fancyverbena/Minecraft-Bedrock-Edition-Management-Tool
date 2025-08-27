@@ -1,11 +1,21 @@
 {
+    "language_name": "English",
     "main_menu": {
         "title": "========== Minecraft Bedrock Edition Management Tool ==========",
         "update_check": "Check for Updates",
         "backup_create": "Create Backup",
         "backup_restore": "Restore from Backup",
         "downgrade": "Version Downgrade",
-        "exit": "Exit"
+        "language": "Language Settings",
+        "version_history": "Version History",
+        "backup_cleanup": "Cleanup Backups",
+        "backup_search": "Search Backups",
+        "backup_compare": "Compare Backups",
+        "exit": "Exit",
+        "select": "Select",
+        "invalid_input": "Invalid input",
+        "install_history": "Installation History",
+        "auto_backup_settings": "Auto Backup Settings"
     },
     "version": {
         "current": "Current",
@@ -18,7 +28,28 @@
         "source_not_found": "Backup source not found.",
         "creating": "Creating backup → {}",
         "complete": "✅ Backup complete",
-        "failed": "❌ Backup failed: {}"
+        "failed": "❌ Backup failed: {}",
+        "preview_title": "\n=== Backup Contents ===",
+        "preview_worlds": "Worlds: {}",
+        "preview_resources": "Resource Packs: {}",
+        "preview_size": "Total Size: {}MB",
+        "preview_failed": "❌ Failed to get preview: {}",
+        "confirm_restore": "Restore this backup? (y/n): ",
+        "restore_cancelled": "Restore cancelled",
+        "compress_complete": "✅ Backup compressed: {}",
+        "compress_failed": "❌ Compression failed: {}",
+        "search_no_results": "No search results found",
+        "search_results": "\nSearch results:",
+        "enter_search": "Enter search keyword: ",
+        "compare_not_enough": "Need at least 2 backups to compare",
+        "select_backups": "\nSelect backups to compare:",
+        "select_first": "Select first backup (number): ",
+        "select_second": "Select second backup (number): ",
+        "comparing": "\nChecking differences...",
+        "file_removed": "- Removed file: {}",
+        "file_modified": "* Modified file: {}",
+        "file_added": "+ Added file: {}",
+        "no_differences": "No differences found"
     },
     "downgrade": {
         "warning": "⚠️ Downgrade is at your own risk. An automatic backup will be created to protect save data.",
@@ -45,7 +76,10 @@
         "selected_release": "Selected release: {} / {}",
         "complete": "✨ Update complete: {}",
         "failed": "❌ Automatic update failed. Manual installation guide:",
-        "open_file": "Open in explorer: {}"
+        "open_file": "Open in explorer: {}",
+        "auto_checking": "Checking for updates automatically...",
+        "new_version_available": "New version {} is available",
+        "proceed_with_update": "Proceed with update? (y/n): "
     },
     "install": {
         "starting": "Starting installation...",
@@ -54,6 +88,43 @@
         "delete_failed": "⚠️ Failed to delete file: {}",
         "force_update": "↺ Newer version exists → Starting forced installation",
         "failed": "❌ Installation failed:\n{}",
-        "error": "❌ Installation error: {}"
+        "error": "❌ Installation error: {}",
+        "using_cache": "Using cached installer",
+        "downloading_to_cache": "Downloading installer to cache...",
+        "cache_complete": "✅ Cache save complete",
+        "cache_failed": "❌ Cache save failed: {}"
+    },
+    "history": {
+        "title": "\n=== Installation History ===",
+        "no_records": "No installation history found",
+        "load_failed": "Failed to load history",
+        "entry_format": "{}: v{} ({})",
+        "method_auto": "Automatic Install",
+        "method_manual": "Manual Install",
+        "method_store": "Microsoft Store",
+        "method_downgrade": "Downgrade"
+    },
+    "auto_backup": {
+        "enabled": "Auto backup is enabled",
+        "disabled": "Auto backup is disabled",
+        "next_backup": "Next backup: {}",
+        "toggle_prompt": "Enable auto backup? (y/n): "
+    },
+    "worlds": {
+        "no_directory": "World directory not found",
+        "no_worlds": "No worlds found",
+        "available": "\nAvailable worlds:",
+        "select": "Select world to export (number): ",
+        "export_complete": "✅ Export complete: {}",
+        "invalid_selection": "Invalid selection"
+    },
+    "stats": {
+        "title": "\n=== Backup Statistics ===",
+        "total_backups": "Total backups: {}",
+        "auto_backups": "Automatic backups: {}",
+        "manual_backups": "Manual backups: {}",
+        "total_size": "Total size: {}MB",
+        "encrypted_backups": "Encrypted backups: {}",
+        "latest_backup": "Latest backup: {}"
     }
 }

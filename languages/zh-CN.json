@@ -1,33 +1,55 @@
 {
+    "language_name": "简体中文",
     "main_menu": {
         "title": "========== Minecraft 基岩版管理工具 ==========",
         "update_check": "检查更新",
         "backup_create": "创建备份",
         "backup_restore": "还原备份",
         "downgrade": "版本降级",
+        "language": "语言设置",
+        "version_history": "版本历史",
+        "backup_cleanup": "清理备份",
+        "backup_search": "搜索备份",
+        "backup_compare": "比较备份",
         "exit": "退出",
-        "invalid_input": "无效输入"
+        "select": "选择",
+        "invalid_input": "无效输入",
+        "install_history": "安装历史",
+        "auto_backup_settings": "自动备份设置"
     },
     "version": {
         "current": "当前版本",
         "latest": "最新版本",
         "get_failed": "获取失败",
         "update_required": "🚨 需要更新",
-        "up_to_date": "🎉 已是最新",
-        "comparing": "--- 版本信息 ---",
-        "not_found": "找不到 Minecraft.Windows.exe"
+        "up_to_date": "🎉 已是最新"
     },
     "backup": {
         "source_not_found": "找不到备份源。",
         "creating": "正在创建备份 → {}",
         "complete": "✅ 备份完成",
         "failed": "❌ 备份失败: {}",
-        "no_folder": "没有备份文件夹",
-        "no_backups": "没有可用的备份",
-        "available": "可用备份:",
-        "select_number": "选择编号 (1-{}):",
-        "restore_complete": "✅ 还原完成",
-        "restore_failed": "❌ 还原失败: {}"
+        "preview_title": "\n=== 备份内容 ===",
+        "preview_worlds": "世界数量: {}",
+        "preview_resources": "资源包: {}",
+        "preview_size": "总大小: {}MB",
+        "preview_failed": "❌ 获取预览失败: {}",
+        "confirm_restore": "是否恢复此备份？(y/n): ",
+        "restore_cancelled": "已取消恢复",
+        "compress_complete": "✅ 备份已压缩: {}",
+        "compress_failed": "❌ 压缩失败: {}",
+        "search_no_results": "未找到搜索结果",
+        "search_results": "\n搜索结果：",
+        "enter_search": "输入搜索关键词：",
+        "compare_not_enough": "需要至少2个备份才能比较",
+        "select_backups": "\n选择要比较的备份：",
+        "select_first": "选择第一个备份（编号）：",
+        "select_second": "选择第二个备份（编号）：",
+        "comparing": "\n正在检查差异...",
+        "file_removed": "- 已删除文件：{}",
+        "file_modified": "* 已修改文件：{}",
+        "file_added": "+ 已添加文件：{}",
+        "no_differences": "未发现差异"
     },
     "downgrade": {
         "warning": "⚠️ 降级风险自负。将自动创建存档备份以保护数据。",
@@ -51,10 +73,13 @@
         "installer_not_found": "❌ 未找到版本 {} 的安装程序。",
         "alt_version": "⚠️ 使用替代版本 {}。",
         "alt_not_found": "❌ 未找到替代安装程序。",
-        "selected_release": "已选择发布版本: {} / {}",
+        "selected_release": "已选择版本: {} / {}",
         "complete": "✨ 更新完成: {}",
         "failed": "❌ 自动更新失败。手动安装指南：",
-        "open_file": "在资源管理器中打开: {}"
+        "open_file": "在资源管理器中打开: {}",
+        "auto_checking": "正在自动检查更新...",
+        "new_version_available": "发现新版本 {}",
+        "proceed_with_update": "是否进行更新？(y/n): "
     },
     "install": {
         "starting": "正在开始安装...",
@@ -63,6 +88,43 @@
         "delete_failed": "⚠️ 文件删除失败: {}",
         "force_update": "↺ 存在新版本 → 开始强制安装",
         "failed": "❌ 安装失败:\n{}",
-        "error": "❌ 安装错误: {}"
+        "error": "❌ 安装错误: {}",
+        "using_cache": "使用缓存安装程序",
+        "downloading_to_cache": "正在下载安装程序到缓存...",
+        "cache_complete": "✅ 缓存保存完成",
+        "cache_failed": "❌ 缓存保存失败: {}"
+    },
+    "history": {
+        "title": "\n=== 安装历史 ===",
+        "no_records": "没有安装历史记录",
+        "load_failed": "加载历史记录失败",
+        "entry_format": "{}: v{} ({})",
+        "method_auto": "自动安装",
+        "method_manual": "手动安装",
+        "method_store": "Microsoft Store",
+        "method_downgrade": "版本降级"
+    },
+    "auto_backup": {
+        "enabled": "自动备份已启用",
+        "disabled": "自动备份已禁用",
+        "next_backup": "下次备份：{}",
+        "toggle_prompt": "是否启用自动备份？(y/n): "
+    },
+    "worlds": {
+        "no_directory": "未找到世界目录",
+        "no_worlds": "未找到世界",
+        "available": "\n可用的世界：",
+        "select": "选择要导出的世界（编号）：",
+        "export_complete": "✅ 导出完成：{}",
+        "invalid_selection": "无效的选择"
+    },
+    "stats": {
+        "title": "\n=== 备份统计信息 ===",
+        "total_backups": "备份总数：{}",
+        "auto_backups": "自动备份数：{}",
+        "manual_backups": "手动备份数：{}",
+        "total_size": "总大小：{}MB",
+        "encrypted_backups": "加密备份数：{}",
+        "latest_backup": "最新备份：{}"
     }
 }
