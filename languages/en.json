@@ -1,0 +1,59 @@
+{
+    "main_menu": {
+        "title": "========== Minecraft Bedrock Edition Management Tool ==========",
+        "update_check": "Check for Updates",
+        "backup_create": "Create Backup",
+        "backup_restore": "Restore from Backup",
+        "downgrade": "Version Downgrade",
+        "exit": "Exit"
+    },
+    "version": {
+        "current": "Current",
+        "latest": "Latest",
+        "get_failed": "Failed to get",
+        "update_required": "🚨 Update required",
+        "up_to_date": "🎉 Up to date"
+    },
+    "backup": {
+        "source_not_found": "Backup source not found.",
+        "creating": "Creating backup → {}",
+        "complete": "✅ Backup complete",
+        "failed": "❌ Backup failed: {}"
+    },
+    "downgrade": {
+        "warning": "⚠️ Downgrade is at your own risk. An automatic backup will be created to protect save data.",
+        "continue": "Continue? (y/n): ",
+        "backup_failed": "❌ Aborting process due to backup failure.",
+        "backup_location": "Save data has been backed up to:\n{}",
+        "available_versions": "Available versions (latest 10):",
+        "invalid_selection": "Invalid selection",
+        "file_not_found": ".appx/.appxbundle/.msixbundle not found",
+        "install_options": "\n1: Automatic installation\n2: Manual installation\n3: Uninstall → Automatic installation",
+        "select_install": "Select (1/2/3): ",
+        "success": "✨ Downgrade successful!",
+        "manual_failed": "Automatic installation failed — please proceed manually.",
+        "manual_steps": "\nManual installation steps\n 1. Open file in explorer: {}\n 2. Allow installation → Wait for completion\n",
+        "open_folder": "Open download folder? (y/n): "
+    },
+    "update": {
+        "checking": "Updating using API...",
+        "version_failed": "❌ Failed to get latest version information.",
+        "release_failed": "❌ Failed to get release information. Please check network/rate limits.",
+        "installer_not_found": "❌ Installer not found for version {}.",
+        "alt_version": "⚠️ Using alternative version {}.",
+        "alt_not_found": "❌ Alternative installer not found.",
+        "selected_release": "Selected release: {} / {}",
+        "complete": "✨ Update complete: {}",
+        "failed": "❌ Automatic update failed. Manual installation guide:",
+        "open_file": "Open in explorer: {}"
+    },
+    "install": {
+        "starting": "Starting installation...",
+        "complete": "✅ Installation complete",
+        "file_deleted": "✨ Download file deleted",
+        "delete_failed": "⚠️ Failed to delete file: {}",
+        "force_update": "↺ Newer version exists → Starting forced installation",
+        "failed": "❌ Installation failed:\n{}",
+        "error": "❌ Installation error: {}"
+    }
+}

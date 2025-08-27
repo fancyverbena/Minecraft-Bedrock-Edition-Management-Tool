@@ -1,0 +1,71 @@
+{
+    "language_name": "日本語",
+    "main_menu": {
+        "title": "========== Minecraft Bedrock Edition 管理ツール ==========",
+        "update_check": "アップデートチェック",
+        "backup_create": "バックアップを作成",
+        "backup_restore": "バックアップからリストア",
+        "downgrade": "バージョンダウングレード",
+        "exit": "終了",
+        "invalid_input": "無効な入力です",
+        "language": "言語設定",
+        "select": "選択"
+    },
+    "version": {
+        "current": "現在",
+        "latest": "最新",
+        "get_failed": "取得失敗",
+        "update_required": "🚨 アップデートが必要です",
+        "up_to_date": "🎉 最新の状態です",
+        "comparing": "--- バージョン情報 ---",
+        "not_found": "Minecraft.Windows.exeが見つかりませんでした"
+    },
+    "backup": {
+        "source_not_found": "バックアップ元が見つかりません。",
+        "creating": "バックアップ作成中 → {}",
+        "complete": "✅ バックアップ完了",
+        "failed": "❌ バックアップ失敗: {}",
+        "no_folder": "バックアップフォルダがありません",
+        "no_backups": "リストア可能なバックアップがありません",
+        "available": "利用可能なバックアップ:",
+        "select_number": "番号を選択 (1-{}):",
+        "restore_complete": "✅ リストア完了",
+        "restore_failed": "❌ リストア失敗: {}"
+    },
+    "downgrade": {
+        "warning": "⚠️ ダウングレードは自己責任です。セーブデータの保護のため自動バックアップを作成します。",
+        "continue": "続行しますか？ (y/n): ",
+        "backup_failed": "❌ バックアップに失敗したため、処理を中止します。",
+        "backup_location": "セーブデータは以下にバックアップされました:\n{}",
+        "available_versions": "利用可能なバージョン（最新 10 件）:",
+        "invalid_selection": "無効な選択です",
+        "file_not_found": ".appx/.appxbundle/.msixbundle が見つかりませんでした",
+        "install_options": "\n1: 自動インストール\n2: 手動インストール\n3: アンインストール → 自動インストール",
+        "select_install": "選択 (1/2/3): ",
+        "success": "✨ ダウングレード成功!",
+        "manual_failed": "自動インストール失敗 — 手動で続行してください。",
+        "manual_steps": "\n手動インストール手順\n 1. エクスプローラーでファイルを開く: {}\n 2. インストール許可 → 完了まで待機\n",
+        "open_folder": "ダウンロードフォルダを開きますか？ (y/n): "
+    },
+    "update": {
+        "checking": "APIを使用して更新します…",
+        "version_failed": "❌ 最新バージョン情報の取得に失敗しました。",
+        "release_failed": "❌ リリース情報が取得できませんでした。ネットワーク/レート制限を確認してください。",
+        "installer_not_found": "❌ バージョン {} のインストーラーが見つかりませんでした。",
+        "alt_version": "⚠️ 代わりにバージョン {} を使用します。",
+        "alt_not_found": "❌ 代替インストーラーも見つかりませんでした。",
+        "selected_release": "選択されたリリース: {} / {}",
+        "complete": "✨ 更新完了: {}",
+        "failed": "❌ 自動更新に失敗しました。手動インストールを案内します。",
+        "open_file": "エクスプローラーで開く: {}"
+    },
+    "install": {
+        "starting": "インストールを開始します...",
+        "complete": "✅ インストール完了",
+        "file_deleted": "✨ ダウンロードファイルを削除しました",
+        "delete_failed": "⚠️ ファイル削除に失敗: {}",
+        "force_update": "↺ 新しいバージョンが存在 → 強制インストールで処理開始",
+        "failed": "❌ インストール失敗:\n{}",
+        "error": "❌ インストールエラー: {}"
+    }
+}

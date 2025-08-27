@@ -1,0 +1,68 @@
+{
+    "main_menu": {
+        "title": "========== 마인크래프트 베드록 에디션 관리 도구 ==========",
+        "update_check": "업데이트 확인",
+        "backup_create": "백업 생성",
+        "backup_restore": "백업에서 복원",
+        "downgrade": "버전 다운그레이드",
+        "exit": "종료",
+        "invalid_input": "잘못된 입력"
+    },
+    "version": {
+        "current": "현재",
+        "latest": "최신",
+        "get_failed": "가져오기 실패",
+        "update_required": "🚨 업데이트 필요",
+        "up_to_date": "🎉 최신 상태",
+        "comparing": "--- 버전 정보 ---",
+        "not_found": "Minecraft.Windows.exe를 찾을 수 없습니다"
+    },
+    "backup": {
+        "source_not_found": "백업 소스를 찾을 수 없습니다.",
+        "creating": "백업 생성 중 → {}",
+        "complete": "✅ 백업 완료",
+        "failed": "❌ 백업 실패: {}",
+        "no_folder": "백업 폴더가 없습니다",
+        "no_backups": "사용 가능한 백업이 없습니다",
+        "available": "사용 가능한 백업:",
+        "select_number": "번호 선택 (1-{}):",
+        "restore_complete": "✅ 복원 완료",
+        "restore_failed": "❌ 복원 실패: {}"
+    },
+    "downgrade": {
+        "warning": "⚠️ 다운그레이드는 본인 책임입니다. 데이터 보호를 위해 자동 백업이 생성됩니다.",
+        "continue": "계속하시겠습니까? (y/n): ",
+        "backup_failed": "❌ 백업 실패로 인해 프로세스를 중단합니다.",
+        "backup_location": "데이터가 다음 위치에 백업되었습니다:\n{}",
+        "available_versions": "사용 가능한 버전 (최신 10개):",
+        "invalid_selection": "잘못된 선택",
+        "file_not_found": ".appx/.appxbundle/.msixbundle를 찾을 수 없습니다",
+        "install_options": "\n1: 자동 설치\n2: 수동 설치\n3: 제거 → 자동 설치",
+        "select_install": "선택 (1/2/3): ",
+        "success": "✨ 다운그레이드 성공!",
+        "manual_failed": "자동 설치 실패 - 수동으로 진행해 주세요.",
+        "manual_steps": "\n수동 설치 단계\n 1. 탐색기에서 파일 열기: {}\n 2. 설치 허용 → 완료까지 대기\n",
+        "open_folder": "다운로드 폴더를 여시겠습니까? (y/n): "
+    },
+    "update": {
+        "checking": "API를 사용하여 업데이트 중...",
+        "version_failed": "❌ 최신 버전 정보를 가져오지 못했습니다.",
+        "release_failed": "❌ 릴리스 정보를 가져오지 못했습니다. 네트워크/속도 제한을 확인하세요.",
+        "installer_not_found": "❌ 버전 {}의 설치 프로그램을 찾을 수 없습니다.",
+        "alt_version": "⚠️ 대체 버전 {} 사용.",
+        "alt_not_found": "❌ 대체 설치 프로그램을 찾을 수 없습니다.",
+        "selected_release": "선택된 릴리스: {} / {}",
+        "complete": "✨ 업데이트 완료: {}",
+        "failed": "❌ 자동 업데이트 실패. 수동 설치 가이드:",
+        "open_file": "탐색기에서 열기: {}"
+    },
+    "install": {
+        "starting": "설치를 시작합니다...",
+        "complete": "✅ 설치 완료",
+        "file_deleted": "✨ 다운로드 파일이 삭제되었습니다",
+        "delete_failed": "⚠️ 파일 삭제 실패: {}",
+        "force_update": "↺ 새 버전 존재 → 강제 설치 시작",
+        "failed": "❌ 설치 실패:\n{}",
+        "error": "❌ 설치 오류: {}"
+    }
+}
