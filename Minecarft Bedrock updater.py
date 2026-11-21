@@ -2,6 +2,7 @@ import os
 import re
 import time
 import json
+import hashlib
 import shutil
 import subprocess
 import sys
@@ -27,8 +28,8 @@ GITHUB_HEADERS = {
     "User-Agent": "BedrockUpdater/1.0 (Python requests)",
 }
 
-PYROCLASTIC_DLL_URL = (
-    "https://github.com/Aetopia/Pyroclastic/releases/latest/download/gamelaunchhelper.dll"
+PYROCLASTIC_LATEST_API = (
+    "https://api.github.com/repos/Aetopia/Pyroclastic/releases/latest"
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -281,16 +282,25 @@ def elevate_and_exit():
         else:
             target = [sys.executable, script] + sys.argv[1:]
 
-        args_str = " ".join(f'"{a}"' for a in target)
+        def bat_quote(value):
+            # '%' would be expanded by cmd.exe even inside quotes, and a
+            # '"' would break out of the quoted argument.
+            return '"' + str(value).replace("%", "%%").replace('"', "") + '"'
 
-        bat_path = os.path.join(
-            tempfile.gettempdir(), "bedrock_updater_elevate.bat"
+        args_str = " ".join(bat_quote(a) for a in target)
+
+        # Unpredictable name in the shared temp dir: a fixed .bat path
+        # could be pre-created/swapped by another local process and
+        # would then be executed elevated via ShellExecuteW "runas".
+        fd, bat_path = tempfile.mkstemp(
+            prefix="bedrock_updater_elevate_", suffix=".bat"
         )
+        os.close(fd)
 
         bat_lines = [
             "@echo off",
             "chcp 65001 > nul",
-            f'cd /d "{script_dir}"',
+            f'cd /d {bat_quote(script_dir)}',
             args_str,
             "set RC=%ERRORLEVEL%",
             "if not %RC%==0 (",
@@ -326,7 +336,13 @@ def elevate_and_exit():
         return False
 
 
-def run_ps(cmd: str, capture=True):
+def run_ps(cmd: str, capture=True, env=None, strict=False):
+    # strict=True turns PowerShell cmdlet errors into terminating errors.
+    # Without it, cmdlets such as Add-AppxPackage can fail while
+    # PowerShell still exits with code 0, so callers would report a
+    # failed install/uninstall as a success.
+    if strict:
+        cmd = "$ErrorActionPreference = 'Stop'; " + cmd
     try:
         result = subprocess.run(
             ["powershell", "-NoLogo", "-NoProfile", "-Command", cmd],
@@ -334,10 +350,115 @@ def run_ps(cmd: str, capture=True):
             text=True,
             encoding="cp932",
             errors="replace",
+            env=env,
         )
         return result.returncode, result.stdout, result.stderr
     except Exception as e:
         return 1, "", str(e)
+
+
+def run_ps_path(cmd: str, **paths):
+    """Run PowerShell passing file paths via environment variables.
+
+    Paths must never be interpolated into the command string: a path or
+    file name containing quotes, '$' or ';' (for example one that came
+    from a remote release asset name) would otherwise be executed as
+    PowerShell code by the (elevated) shell.
+    """
+    env = dict(os.environ)
+    env.update(paths)
+    return run_ps(cmd, env=env, strict=True)
+
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def asset_sha256(asset):
+    """SHA-256 digest GitHub reports for a release asset, or None."""
+    digest = (asset or {}).get("digest") or ""
+    if digest.startswith("sha256:"):
+        value = digest[len("sha256:"):].strip().lower()
+        if re.fullmatch(r"[0-9a-f]{64}", value):
+            return value
+    return None
+
+
+def sanitize_filename(name, fallback="download.bin"):
+    """Reduce a remote-supplied file name to a safe plain file name."""
+    base = os.path.basename(str(name or "").replace("\\", "/"))
+    base = re.sub(r"[^A-Za-z0-9._-]", "_", base).lstrip(".")
+    return base or fallback
+
+
+def private_temp_path(filename):
+    """Create a private, unpredictably named temp file for a download.
+
+    Fixed names under the shared temp directory let another local
+    process pre-create or swap the file between download and install,
+    which matters because this tool runs elevated.
+    """
+    safe = sanitize_filename(filename)
+    suffix = os.path.splitext(safe)[1]
+    fd, path = tempfile.mkstemp(prefix="bedrock_updater_", suffix=suffix)
+    os.close(fd)
+    return path
+
+
+def download_verified(url, filename, expected_sha256, label):
+    """Download to a private temp file and verify its SHA-256.
+
+    Fails closed: when GitHub reports no digest for the asset, or the
+    downloaded bytes do not match it, nothing is returned and the
+    partial file is removed, so unverified bytes are never installed.
+    """
+    if not expected_sha256:
+        print(f"❌ {label}: リリース情報に SHA256 が無いため、検証できないダウンロードを中止しました")
+        return None
+    temp_path = private_temp_path(filename)
+    try:
+        with requests.get(url, stream=True, timeout=60) as r:
+            r.raise_for_status()
+            total = int(r.headers.get("content-length", 0))
+            h = hashlib.sha256()
+            with tqdm(
+                total=total, unit="iB", unit_scale=True
+            ) as bar, open(temp_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        h.update(chunk)
+                        f.write(chunk)
+                        bar.update(len(chunk))
+        actual = h.hexdigest()
+        if actual.lower() != expected_sha256.lower():
+            print(f"❌ {label}: SHA256 が一致しません (expected {expected_sha256}, got {actual})")
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+            return None
+        print(f"✅ {label}: SHA256 検証OK")
+        return temp_path
+    except Exception as e:
+        print(f"❌ {label}: {e}")
+        try:
+            os.remove(temp_path)
+        except Exception:
+            pass
+        return None
+
+
+def open_in_explorer(path):
+    # Pass the path as a single argv element; never build a shell
+    # command string out of it.
+    try:
+        subprocess.run(["explorer", f"/select,{path}"], check=False)
+    except Exception:
+        pass
 
 
 def get_minecraft_install_folder():
@@ -363,7 +484,31 @@ def is_pyroclastic_installed():
     folder = get_minecraft_install_folder()
     if not folder:
         return False
-    return os.path.exists(os.path.join(folder, "gamelaunchhelper.dll"))
+    path = os.path.join(folder, "gamelaunchhelper.dll")
+    try:
+        return os.path.getsize(path) > 0
+    except OSError:
+        return False
+
+
+def get_pyroclastic_asset():
+    """(download_url, sha256) for gamelaunchhelper.dll, or (None, None).
+
+    The digest comes from the GitHub releases API; the bare
+    releases/latest/download URL on its own offers nothing to verify
+    the downloaded DLL against.
+    """
+    try:
+        r = requests.get(
+            PYROCLASTIC_LATEST_API, headers=GITHUB_HEADERS, timeout=10
+        )
+        r.raise_for_status()
+        for asset in r.json().get("assets", []):
+            if asset.get("name") == "gamelaunchhelper.dll":
+                return asset.get("browser_download_url"), asset_sha256(asset)
+    except Exception as e:
+        print(f"⚠️ Pyroclastic リリース情報取得失敗: {e}")
+    return None, None
 
 
 def install_pyroclastic():
@@ -384,22 +529,18 @@ def install_pyroclastic():
         return False
 
     print(tr.get("pyroclastic.downloading"))
+    temp_path = None
     try:
-        temp_dir = tempfile.gettempdir()
-        temp_path = os.path.join(temp_dir, "gamelaunchhelper.dll")
-
-        with requests.get(
-            PYROCLASTIC_DLL_URL, stream=True, timeout=60
-        ) as r:
-            r.raise_for_status()
-            total = int(r.headers.get("content-length", 0))
-            with tqdm(
-                total=total, unit="iB", unit_scale=True
-            ) as bar, open(temp_path, "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-                        bar.update(len(chunk))
+        url, digest = get_pyroclastic_asset()
+        if not url:
+            print(f"❌ {tr.get('pyroclastic.download_failed')}")
+            return False
+        temp_path = download_verified(
+            url, "gamelaunchhelper.dll", digest, tr.get("pyroclastic.downloading")
+        )
+        if not temp_path:
+            print(f"❌ {tr.get('pyroclastic.download_failed')}")
+            return False
 
         print("✅ ダウンロード完了")
         print(tr.get("pyroclastic.copying"))
@@ -409,23 +550,23 @@ def install_pyroclastic():
         try:
             shutil.copy2(temp_path, target)
         except PermissionError:
-            run_ps(
-                f'Copy-Item -Path "{temp_path}" '
-                f'-Destination "{target}" -Force; "ok"'
+            rc, _, err = run_ps_path(
+                "Copy-Item -Path $env:BEDROCK_SRC "
+                "-Destination $env:BEDROCK_DST -Force -ErrorAction Stop",
+                BEDROCK_SRC=temp_path,
+                BEDROCK_DST=target,
             )
-            if not os.path.exists(target):
+            if rc != 0:
                 print(
                     "⚠️ 権限エラー。管理者権限で実行しているか確認してください。"
+                    f" ({err.strip()})"
                 )
                 return False
 
-        try:
-            os.remove(temp_path)
-        except Exception:
-            pass
-
         print(tr.get("pyroclastic.verify"))
-        if os.path.exists(target):
+        # Existence alone is not proof: a truncated or swapped copy must
+        # not count as installed, so compare hashes.
+        if os.path.exists(target) and sha256_file(target) == sha256_file(temp_path):
             print(f"✅ {tr.get('pyroclastic.installed')}")
             print(tr.get("pyroclastic.location", target))
             return True
@@ -439,6 +580,12 @@ def install_pyroclastic():
     except Exception as e:
         print(f"❌ {tr.get('pyroclastic.install_failed')}: {e}")
         return False
+    finally:
+        if temp_path:
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
 
 
 def uninstall_pyroclastic():
@@ -627,25 +774,34 @@ def get_onix_versions():
 def find_asset_url(
     assets, exts=(".msixbundle", ".appxbundle", ".appx", ".msixvc")
 ):
+    """(url, name, sha256) for the first installable asset, or Nones.
+
+    The digest travels with the URL so the download can be verified
+    before anything is installed from it.
+    """
     for asset in assets:
         name = asset.get("name", "")
         if name.lower().endswith(exts):
-            return asset.get("browser_download_url"), name
+            return asset.get("browser_download_url"), name, asset_sha256(asset)
 
     for asset in assets:
         name = asset.get("name", "").lower()
         if "minecraft" in name and name.endswith((".zip", ".rar")):
-            return asset.get("browser_download_url"), asset.get("name")
+            return (
+                asset.get("browser_download_url"),
+                asset.get("name"),
+                asset_sha256(asset),
+            )
 
-    return None, None
+    return None, None, None
 
 
 def filter_installable_releases(vers):
     result = []
     for tag, assets in vers:
-        url, fname = find_asset_url(assets)
+        url, fname, digest = find_asset_url(assets)
         if url and fname:
-            result.append((tag, url, fname))
+            result.append((tag, url, fname, digest))
     return result
 
 
@@ -702,38 +858,32 @@ def select_release_paged(releases, page_size=RELEASES_PER_PAGE):
         print(tr.get("downgrade.invalid_input"))
 
 
-def download_bundle(url, filename):
+def download_bundle(url, filename, expected_sha256=None):
     print(f"\n{tr.get('update.downloading', filename)}")
-    try:
-        temp_dir = tempfile.gettempdir()
-        temp_path = os.path.join(temp_dir, filename)
-
-        with requests.get(url, stream=True, timeout=60) as r:
-            r.raise_for_status()
-            total = int(r.headers.get("content-length", 0))
-            with tqdm(
-                total=total, unit="iB", unit_scale=True
-            ) as bar, open(temp_path, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1024 * 1024):
-                    if chunk:
-                        f.write(chunk)
-                        bar.update(len(chunk))
-
-        print(f"✅ {tr.get('update.download_complete', temp_path)}")
-
-        def cleanup_temp_file():
-            try:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
-                    print("✨ 一時ファイルを削除しました")
-            except Exception as e:
-                print(f"⚠️ 一時ファイルの削除に失敗: {e}")
-
-        atexit.register(cleanup_temp_file)
-        return temp_path
-    except Exception as e:
-        print(f"❌ {tr.get('update.download_failed', e)}")
+    # The file name comes from a remote release asset: sanitize it and
+    # store the download under a private, unpredictable temp name
+    # instead of os.path.join(tempdir, filename), which allowed both
+    # path traversal ('../' in the asset name) and pre-creation /
+    # swapping of the file by another local process.
+    temp_path = download_verified(
+        url, filename, expected_sha256, tr.get("update.downloading", filename)
+    )
+    if not temp_path:
+        print(f"❌ {tr.get('update.download_failed', filename)}")
         return None
+
+    print(f"✅ {tr.get('update.download_complete', temp_path)}")
+
+    def cleanup_temp_file():
+        try:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+                print("✨ 一時ファイルを削除しました")
+        except Exception as e:
+            print(f"⚠️ 一時ファイルの削除に失敗: {e}")
+
+    atexit.register(cleanup_temp_file)
+    return temp_path
 
 
 def uninstall_minecraft():
@@ -741,7 +891,9 @@ def uninstall_minecraft():
         print("⚠️ 管理者権限が必要です。")
         return False
     rc, _, err = run_ps(
-        'Get-AppxPackage -Name "Microsoft.MinecraftUWP" | Remove-AppxPackage'
+        'Get-AppxPackage -Name "Microsoft.MinecraftUWP" | '
+        "Remove-AppxPackage -ErrorAction Stop",
+        strict=True,
     )
     if rc == 0:
         print("✅ アンインストール完了")
@@ -757,25 +909,29 @@ def install_appx(path, force=False):
 
     print(tr.get("update.installing"))
     try:
-        ps = [
-            "Add-AppxPackage",
-            f'-Path "{path}"',
-            "-AllowUnsigned",
-            "-ForceApplicationShutdown",
-        ]
+        # The package path is passed via an environment variable, not
+        # interpolated into the command string. -AllowUnsigned is gone:
+        # the download's SHA-256 is verified against the GitHub release
+        # digest before this point, and Windows should still check the
+        # package signature instead of installing unsigned packages.
+        ps = (
+            "Add-AppxPackage -Path $env:BEDROCK_APX_PATH "
+            "-ForceApplicationShutdown -ErrorAction Stop"
+        )
         if force:
-            ps.append("-ForceUpdateFromAnyVersion")
-        rc, _, err = run_ps(" ".join(ps))
+            ps += " -ForceUpdateFromAnyVersion"
+        rc, out, err = run_ps_path(ps, BEDROCK_APX_PATH=path)
+        combined = (err or "") + (out or "")
 
         if rc == 0:
             print(f"✅ {tr.get('update.install_complete')}")
             return True
 
-        if "0x80073D06" in err and not force:
+        if "0x80073D06" in combined and not force:
             print("↺ 新しいバージョンが存在 → 強制インストールで処理開始")
             return install_appx(path, force=True)
 
-        print(f"❌ {tr.get('update.install_failed', err.strip())}")
+        print(f"❌ {tr.get('update.install_failed', combined.strip())}")
         return False
     except Exception as e:
         print(f"❌ {tr.get('update.install_failed', e)}")
@@ -798,22 +954,22 @@ def start_update_with_powershell():
         print(f"❌ {tr.get('update.no_releases')}")
         return
 
-    url, fname, tag = None, None, None
-    for r_tag, r_url, r_fname in installable:
+    url, fname, tag, digest = None, None, None, None
+    for r_tag, r_url, r_fname, r_digest in installable:
         if r_tag.replace("v", "") == latest_version:
-            url, fname, tag = r_url, r_fname, r_tag
+            url, fname, tag, digest = r_url, r_fname, r_tag, r_digest
             break
 
     if not url:
         print(
             f"❌ {tr.get('update.version_not_found', latest_version)}"
         )
-        tag, url, fname = installable[0]
+        tag, url, fname, digest = installable[0]
         print(f"⚠️ {tr.get('update.using_fallback', tag)}")
 
     print(tr.get("update.selected_release", tag, fname))
 
-    path = download_bundle(url, fname)
+    path = download_bundle(url, fname, digest)
     if not path:
         return
 
@@ -837,7 +993,7 @@ def start_update_with_powershell():
     else:
         print(f"\n❌ {tr.get('update.update_failed')}")
         print(f"  エクスプローラーで開く: {path}")
-        os.system(f'explorer /select,"{path}"')
+        open_in_explorer(path)
 
 
 def downgrade_minecraft():
@@ -878,7 +1034,7 @@ def downgrade_minecraft():
         print(tr.get("downgrade.cancelled"))
         return
 
-    tag, url, fname = installable[idx]
+    tag, url, fname, digest = installable[idx]
 
     mode = input(tr.get("downgrade.select_mode")).strip()
 
@@ -886,7 +1042,7 @@ def downgrade_minecraft():
         if not uninstall_minecraft():
             return
 
-    path = download_bundle(url, fname)
+    path = download_bundle(url, fname, digest)
     if not path:
         return
 
@@ -903,7 +1059,7 @@ def downgrade_minecraft():
 
     print(tr.get("downgrade.manual_instructions", path))
     if input(tr.get("downgrade.open_folder")).lower() == "y":
-        os.system(f'explorer /select,"{path}"')
+        open_in_explorer(path)
 
 
 def check_for_updates_auto():
